@@ -25,9 +25,9 @@ interface Med {
 }
 
 const MEDS: Med[] = [
-  { key: "antihistamina", name: "Anti\nHistamina", emoji: "🌿", color: "#007AFF", glow: "rgba(0,122,255,0.30)" },
-  { key: "zinc",          name: "Zinc",            emoji: "⚡", color: "#FF9500", glow: "rgba(255,149,0,0.30)"  },
-  { key: "magnesio",      name: "Magnesio",        emoji: "🔮", color: "#AF52DE", glow: "rgba(175,82,222,0.30)"},
+  { key: "desaler", name: "Desaler", emoji: "🌿", color: "#007AFF", glow: "rgba(0,122,255,0.30)" },
+  { key: "zinc",    name: "Zinc",    emoji: "⚡", color: "#FF9500", glow: "rgba(255,149,0,0.30)"  },
+  { key: "magnesio",name: "Magnesio",emoji: "🔮", color: "#AF52DE", glow: "rgba(175,82,222,0.30)"},
 ];
 
 // ── helpers ───────────────────────────────────────────────
@@ -157,7 +157,16 @@ function MedColumn({ med, logs, onLog }: { med: Med; logs: MedLog[]; onLog: (k: 
 type LogMap = Record<string, MedLog[]>;
 
 export default function App() {
-  const [logs, setLogs] = useState<LogMap>({ antihistamina: [], zinc: [], magnesio: [] });
+  function isSameDay(a: Date, b: Date) {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+
+  function fmtDateInput(d: Date) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  }
+
+  const [logs, setLogs] = useState<LogMap>({ desaler: [], zinc: [], magnesio: [] });
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
 
   const handleLog = useCallback((key: string) => {
     setLogs(prev => ({
@@ -167,8 +176,11 @@ export default function App() {
   }, []);
 
   const handleReset = useCallback(() => {
-    setLogs({ antihistamina: [], zinc: [], magnesio: [] });
+    setLogs({ desaler: [], zinc: [], magnesio: [] });
   }, []);
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
 
   const total = Object.values(logs).reduce((a, l) => a + l.length, 0);
 
@@ -201,10 +213,51 @@ export default function App() {
 
         <div style={{ height: 1, background: BORDER, margin: "16px 18px 18px" }} />
 
+        {/* date filter */}
+        <div style={{ padding: "0 14px 12px", display: "flex", gap: 6, alignItems: "center" }}>
+          <button
+            onClick={() => setSelectedDate(new Date())}
+            style={{
+              flex: 1, padding: "8px 0", borderRadius: 10, border: "none",
+              background: isSameDay(selectedDate, new Date()) ? "#007AFF" : SURFACE,
+              color: isSameDay(selectedDate, new Date()) ? "#fff" : SUBTLE,
+              fontFamily: "Inter,sans-serif", fontSize: 12, fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >Hoy</button>
+          <button
+            onClick={() => {
+              const y = new Date();
+              y.setDate(y.getDate() - 1);
+              setSelectedDate(y);
+            }}
+            style={{
+              flex: 1, padding: "8px 0", borderRadius: 10, border: "none",
+              background: isSameDay(selectedDate, yesterday) ? "#007AFF" : SURFACE,
+              color: isSameDay(selectedDate, yesterday) ? "#fff" : SUBTLE,
+              fontFamily: "Inter,sans-serif", fontSize: 12, fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >Ayer</button>
+          <input
+            type="date"
+            value={fmtDateInput(selectedDate)}
+            onChange={e => {
+              const d = new Date(e.target.value + "T00:00:00");
+              if (!isNaN(d.getTime())) setSelectedDate(d);
+            }}
+            style={{
+              flex: 1.5, padding: "8px 10px", borderRadius: 10, border: "none",
+              background: SURFACE, color: TEXT,
+              fontFamily: "Inter,sans-serif", fontSize: 12, fontWeight: 600,
+            }}
+          />
+        </div>
+
         {/* 3-column grid */}
         <div style={{ padding: "0 10px", display: "flex", gap: 8, flex: 1, alignItems: "flex-start" }}>
           {MEDS.map(med => (
-            <MedColumn key={med.key} med={med} logs={logs[med.key]} onLog={handleLog} />
+            <MedColumn key={med.key} med={med} logs={logs[med.key].filter(l => isSameDay(l.timestamp, selectedDate))} onLog={handleLog} />
           ))}
         </div>
 
