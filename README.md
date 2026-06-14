@@ -1,11 +1,14 @@
+# Pastillero
 
-  # Minimalist Medicine Tracker UI
+App Android para trackear medicación diaria. Hecha con React + Capacitor.
 
-  This is a code bundle for Minimalist Medicine Tracker UI. The original project is available at https://www.figma.com/design/OpsIAuWkq8BOb7zs1AOvl0/Minimalist-Medicine-Tracker-UI.
+## Comandos
 
-  ## Running the code
+```bash
+npm run build          # compila el frontend
+npx cap copy           # sincroniza con Android
+cd android
+./gradlew assembleDebug   # genera el APK
+```
 
-  Run `npm i` to install the dependencies.
-
-  Run `npm run dev` to start the development server.
-  
+El APK se genera en `android/app/build/outputs/apk/debug/app-debug.apk`.
