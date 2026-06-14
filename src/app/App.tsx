@@ -196,7 +196,7 @@ export default function App() {
         html, body { background: ${BG}; }
       `}</style>
 
-      <div style={{ maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", minHeight: "100dvh", padding: "0 0 36px" }}>
+      <div style={{ maxWidth: 480, margin: "0 auto", display: "flex", flexDirection: "column", minHeight: "100dvh", padding: "0 0 36px", overflowX: "hidden" }}>
 
         {/* Android-style top bar */}
         <div style={{ padding: "44px 18px 0" }}>
@@ -214,11 +214,11 @@ export default function App() {
         <div style={{ height: 1, background: BORDER, margin: "16px 18px 18px" }} />
 
         {/* date filter */}
-        <div style={{ padding: "0 14px 12px", display: "flex", gap: 6, alignItems: "center" }}>
+        <div style={{ padding: "0 14px 12px", display: "flex", gap: 6, alignItems: "center", minWidth: 0 }}>
           <button
             onClick={() => setSelectedDate(new Date())}
             style={{
-              flex: 1, padding: "8px 0", borderRadius: 10, border: "none",
+              flex: "1 1 0", minWidth: 0, padding: "8px 0", borderRadius: 10, border: "none",
               background: isSameDay(selectedDate, new Date()) ? "#007AFF" : SURFACE,
               color: isSameDay(selectedDate, new Date()) ? "#fff" : SUBTLE,
               fontFamily: "Inter,sans-serif", fontSize: 12, fontWeight: 700,
@@ -232,7 +232,7 @@ export default function App() {
               setSelectedDate(y);
             }}
             style={{
-              flex: 1, padding: "8px 0", borderRadius: 10, border: "none",
+              flex: "1 1 0", minWidth: 0, padding: "8px 0", borderRadius: 10, border: "none",
               background: isSameDay(selectedDate, yesterday) ? "#007AFF" : SURFACE,
               color: isSameDay(selectedDate, yesterday) ? "#fff" : SUBTLE,
               fontFamily: "Inter,sans-serif", fontSize: 12, fontWeight: 700,
@@ -247,15 +247,16 @@ export default function App() {
               if (!isNaN(d.getTime())) setSelectedDate(d);
             }}
             style={{
-              flex: 1.5, padding: "8px 10px", borderRadius: 10, border: "none",
+              flex: "1.5 1 0", minWidth: 0, width: "100%", padding: "8px 10px", borderRadius: 10, border: "none",
               background: SURFACE, color: TEXT,
               fontFamily: "Inter,sans-serif", fontSize: 12, fontWeight: 600,
+              boxSizing: "border-box",
             }}
           />
         </div>
 
         {/* 3-column grid */}
-        <div style={{ padding: "0 10px", display: "flex", gap: 8, flex: 1, alignItems: "flex-start" }}>
+        <div style={{ padding: "0 8px", display: "flex", gap: 6, flex: 1, alignItems: "flex-start" }}>
           {MEDS.map(med => (
             <MedColumn key={med.key} med={med} logs={logs[med.key].filter(l => isSameDay(l.timestamp, selectedDate))} onLog={handleLog} />
           ))}
