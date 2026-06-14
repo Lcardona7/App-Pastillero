@@ -212,17 +212,16 @@ export default function App() {
 
   const handleLog = useCallback((key: string) => {
     setLogs(prev => {
-      const today = new Date();
-      const existing = prev[key].find(l => isSameDay(l.timestamp, today));
+      const existing = prev[key].find(l => isSameDay(l.timestamp, selectedDate));
       if (existing) {
         return { ...prev, [key]: prev[key].filter(l => l.id !== existing.id) };
       }
       return {
         ...prev,
-        [key]: [{ id: `${Date.now()}-${Math.random()}`, timestamp: today }, ...prev[key]],
+        [key]: [{ id: `${Date.now()}-${Math.random()}`, timestamp: selectedDate }, ...prev[key]],
       };
     });
-  }, []);
+  }, [selectedDate]);
 
   const handleReset = useCallback(() => {
     setLogs({ desaler: [], zinc: [], magnesio: [] });
