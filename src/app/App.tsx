@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import "../styles/fonts.css";
 
 const BG        = "#0f1117";
@@ -204,10 +204,30 @@ function MonthCalendar({ logs, currentMonth, onPrevMonth, onNextMonth }: { logs:
   );
 }
 
+const STORAGE_KEY = "pastillero_logs";
+
+function loadLogs(): LogMap {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { desaler: [], zinc: [], magnesio: [] };
+    const parsed = JSON.parse(raw);
+    for (const key of Object.keys(parsed)) {
+      parsed[key] = parsed[key].map((l: any) => ({ ...l, timestamp: new Date(l.timestamp) }));
+    }
+    return parsed;
+  } catch {
+    return { desaler: [], zinc: [], magnesio: [] };
+  }
+}
+
 export default function App() {
-  const [logs, setLogs] = useState<LogMap>({ desaler: [], zinc: [], magnesio: [] });
+  const [logs, setLogs] = useState<LogMap>(loadLogs);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [calendarMonth, setCalendarMonth] = useState(() => new Date());
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+  }, [logs]);
 
   const handleLog = useCallback((key: string) => {
     setLogs(prev => {
