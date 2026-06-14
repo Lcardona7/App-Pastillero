@@ -24,7 +24,7 @@ interface Med {
 }
 
 const MEDS: Med[] = [
-  { key: "desaler", name: "Desaler", emoji: "🌿", color: "#34C759", glow: "rgba(52,199,89,0.30)" },
+  { key: "desaler", name: "Desaler", emoji: "🌿", color: "#007AFF", glow: "rgba(0,122,255,0.30)" },
   { key: "zinc",    name: "Zinc",    emoji: "⚡", color: "#FF9500", glow: "rgba(255,149,0,0.30)"  },
   { key: "magnesio",name: "Magnesio",emoji: "🔮", color: "#AF52DE", glow: "rgba(175,82,222,0.30)"},
 ];
@@ -65,13 +65,7 @@ function LogCard({ log, color, fresh }: { log: MedLog; color: string; fresh: boo
 
 function MedColumn({ med, logs, onLog }: { med: Med; logs: MedLog[]; onLog: (k: string) => void }) {
   const [pressed, setPressed] = useState(false);
-  const [justLogged, setJustLogged] = useState(false);
-
-  const handleTap = () => {
-    onLog(med.key);
-    setJustLogged(true);
-    setTimeout(() => setJustLogged(false), 1100);
-  };
+  const isTaken = logs.length > 0;
 
   return (
     <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 8 }}>
@@ -88,55 +82,31 @@ function MedColumn({ med, logs, onLog }: { med: Med; logs: MedLog[]; onLog: (k: 
           fontFamily: "Inter,sans-serif", fontSize: 13, fontWeight: 700,
           color: TEXT, textAlign: "center", lineHeight: 1.25,
         }}>{med.name}</span>
-        <span style={{ fontFamily: "Inter,sans-serif", fontSize: 11, color: SUBTLE, fontWeight: 500 }}>
-          {logs.length} toma{logs.length !== 1 ? "s" : ""}
-        </span>
       </div>
 
       <button
-        onPointerDown={() => setPressed(true)}
-        onPointerUp={() => setPressed(false)}
-        onPointerLeave={() => setPressed(false)}
-        onClick={handleTap}
+        onClick={() => onLog(med.key)}
         style={{
           width: "100%", minHeight: 72,
-          background: justLogged ? GREEN : med.color,
+          background: isTaken ? GREEN : med.color,
           color: "#ffffff", border: "none", borderRadius: 14,
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2,
           cursor: "pointer",
           transition: "background 0.3s ease, transform 0.08s ease",
           transform: pressed ? "scale(0.96)" : "scale(1)",
-          boxShadow: pressed ? "none" : justLogged ? `0 4px 18px rgba(76,217,100,0.35)` : `0 4px 18px ${med.glow}`,
+          boxShadow: pressed ? "none" : `0 4px 18px ${isTaken ? "rgba(76,217,100,0.35)" : med.glow}`,
           userSelect: "none", WebkitTapHighlightColor: "transparent",
           padding: "10px 6px",
         } as React.CSSProperties}
+        onPointerDown={() => setPressed(true)}
+        onPointerUp={() => setPressed(false)}
+        onPointerLeave={() => setPressed(false)}
       >
-        <span style={{ fontSize: justLogged ? 24 : 20 }}>{justLogged ? "✅" : "💊"}</span>
+        <span style={{ fontSize: isTaken ? 24 : 20 }}>{isTaken ? "✅" : "💊"}</span>
         <span style={{ fontFamily: "Inter,sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em" }}>
-          {justLogged ? "¡LISTO!" : "TOMÉ"}
+          {isTaken ? "¡LISTO!" : "TOMÉ"}
         </span>
       </button>
-
-      {logs.length === 0 ? (
-        <div style={{
-          textAlign: "center", padding: "10px 4px",
-          color: SUBTLE, fontStyle: "italic",
-          fontFamily: "Inter,sans-serif", fontSize: 11, lineHeight: 1.5,
-        }}>
-          Sin registros
-        </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-          {logs.slice(0, 6).map((log, i) => (
-            <LogCard key={log.id} log={log} color={med.color} fresh={i === 0} />
-          ))}
-          {logs.length > 6 && (
-            <span style={{ fontFamily: "Inter,sans-serif", fontSize: 10, color: SUBTLE, textAlign: "center" }}>
-              +{logs.length - 6} más
-            </span>
-          )}
-        </div>
-      )}
     </div>
   );
 }
@@ -241,10 +211,17 @@ export default function App() {
   const [calendarMonth, setCalendarMonth] = useState(() => new Date());
 
   const handleLog = useCallback((key: string) => {
-    setLogs(prev => ({
-      ...prev,
-      [key]: [{ id: `${Date.now()}-${Math.random()}`, timestamp: new Date() }, ...prev[key]],
-    }));
+    setLogs(prev => {
+      const today = new Date();
+      const existing = prev[key].find(l => isSameDay(l.timestamp, today));
+      if (existing) {
+        return { ...prev, [key]: prev[key].filter(l => l.id !== existing.id) };
+      }
+      return {
+        ...prev,
+        [key]: [{ id: `${Date.now()}-${Math.random()}`, timestamp: today }, ...prev[key]],
+      };
+    });
   }, []);
 
   const handleReset = useCallback(() => {
