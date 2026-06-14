@@ -8,7 +8,6 @@ const TEXT      = "#e8eaf0";
 const SUBTLE    = "#6b7491";
 const BORDER    = "rgba(255,255,255,0.07)";
 const GREEN     = "#4CD964";
-const RED       = "#FF3B30";
 
 interface MedLog {
   id: string;
@@ -223,14 +222,8 @@ export default function App() {
     });
   }, [selectedDate]);
 
-  const handleReset = useCallback(() => {
-    setLogs({ desaler: [], zinc: [], magnesio: [] });
-  }, []);
-
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-
-  const total = Object.values(logs).reduce((a, l) => a + l.length, 0);
 
   function fmtDateInput(d: Date) {
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
@@ -321,23 +314,7 @@ export default function App() {
           onNextMonth={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
         />
 
-        <div style={{ padding: "20px 4px 0", display: "flex", justifyContent: "center" }}>
-          <button
-            onClick={handleReset}
-            disabled={total === 0}
-            style={{
-              background: "none", border: "none",
-              color: total === 0 ? SUBTLE : RED,
-              fontFamily: "Inter,sans-serif", fontSize: 13, fontWeight: 600,
-              cursor: total === 0 ? "default" : "pointer",
-              padding: "10px 20px", borderRadius: 8,
-              letterSpacing: "0.04em", textTransform: "uppercase",
-              opacity: total === 0 ? 0.4 : 1,
-            }}
-          >
-            Resetear historial
-          </button>
-        </div>
+        <div style={{ padding: "12px 4px 0" }} />
 
       </div>
     </div>
