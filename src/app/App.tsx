@@ -24,7 +24,7 @@ interface Med {
 }
 
 const MEDS: Med[] = [
-  { key: "desaler", name: "Desaler", emoji: "🌿", color: "#007AFF", glow: "rgba(0,122,255,0.30)" },
+  { key: "desaler", name: "Desaler", emoji: "🌿", color: "#34C759", glow: "rgba(52,199,89,0.30)" },
   { key: "zinc",    name: "Zinc",    emoji: "⚡", color: "#FF9500", glow: "rgba(255,149,0,0.30)"  },
   { key: "magnesio",name: "Magnesio",emoji: "🔮", color: "#AF52DE", glow: "rgba(175,82,222,0.30)"},
 ];
